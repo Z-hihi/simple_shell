@@ -16,16 +16,18 @@
 #define FALSE 0
 #define BUFSIZE 1024
 
-
 extern char **environ;
 
 /**
-
-struct builtin_t - Structure for builtin
-@cmd: the command
-@f: the appropriate
+*struct builtin_t - Structure for builtin
+*@cmd: the command
+*@f: the appropriate
 */
-typedef struct builtin_t { char *cmd; int (*f)(char **, int, char *);} builtin_t;
+typedef struct builtin_t
+{
+	char *cmd;
+	int (*f)(char **, int, char *);
+} builtin_t;
 
 int execute(char **cmd, char *filename);
 
