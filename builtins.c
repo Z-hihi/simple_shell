@@ -101,4 +101,4 @@ int exit_cmd(char **cmd, int status, char *filename)
 	free_memory_pp(cmd);
 
 	exit(status);
-g
+}
