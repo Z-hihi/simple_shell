@@ -42,9 +42,9 @@ lenv_s *add_node(lenv_s **head, char *str)
 		return (NULL);
 	}
 	node->var = _str;
-	node->next = '\0';
+	node->next = NULL;
 
-	if (*head == '\0')
+	if (*head == NULL)
 	{
 		*head = node;
 		return (node);
@@ -71,7 +71,7 @@ size_t print_list(lenv_s **head)
 
 	for (i = 0; h ; i++)
 	{
-		if (h->var == '\0')
+		if (h->var == NULL)
 			printf("[0] (nil)\n");
 		else
 			printf("%s\n", h->var);
@@ -115,12 +115,12 @@ void free_list(lenv_s **head)
 
 	h = *head;
 	position = h;
-	while (position != '\0')
+	while (position != NULL)
 	{
 		next = position->next;
 		free(position->var);
 		free(position);
 		position = next;
 	}
-	h = '\0';
+	h = NULL;
 }
