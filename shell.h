@@ -1,64 +1,110 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-/* Header Files */
-#include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/syscall.h>
 #include <sys/wait.h>
-#include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+#include <dirent.h>
+#include <ctype.h>
+#include <signal.h>
 
-/* Macros */
-#define TRUE 1
-#define FALSE 0
-#define BUFSIZE 1024
-
+#define HISTORY_FILE ".simple_shell_history"
 extern char **environ;
 
+
 /**
-*struct builtin_t - Structure for builtin
-*@cmd: the command
-*@f: the appropriate
-*/
-typedef struct builtin_t
+ * struct commhist - Structure for the command history
+ * @id: Id for the node
+ * @cmd: The command
+ * @next: The next node
+ */
+typedef struct commhist
 {
+	int id;
 	char *cmd;
-	int (*f)(char **, int, char *);
-} builtin_t;
+	struct commhist *next;
+} commhist_s;
 
-int execute(char **cmd, char *filename);
+/**
+ * struct lenv_s - singly linked list
+ * @str: variable
+ * @next: points to the next node
+ * @var: enviroment variables.
+ * Description: singly linked list node to store the env
+ */
+typedef struct lenv_s
+{
+	char *var;
+	struct lenv_s *next;
+} lenv_s;
 
-void init_prompt(void);
+/**
+ * struct builtin - Structure for builtins
+ * @s: String to compare
+ * @f: Function to execute
+ */
+typedef struct builtin
+{
+	char *s;
+	int (*f)();
+} builtin_s;
 
-char *rm_newline(char *line);
-char **parse_input(char *line);
-char *build_path(char *token, char *value);
-int check_cmd_path(char **cmd);
-int _strlen(const char *s);
-char *_strstr(char *haystack, char *needle);
-char *_strcpy(char *dest, const char *src);
-char *_strcat(char *dest, const char *src);
+int myexec(int argc, char **argv, lenv_s **env, unsigned int *execnt);
+int interact(char **argv, lenv_s **env, unsigned int *execnt);
+void handsigint(int sign);
+char *path(char *name, lenv_s **env);
+int currhist(commhist_s **h, commhist_s **t);
+int addhist(char **argv);
+int savehist(lenv_s **lenv);
+int sizehist(lenv_s **lenv);
+int loadhist(lenv_s **lenv);
+
+/* Function related with Built-ins */
+int (*check_builtin(char *line))();
+int _env(char **argv, lenv_s **lenv, unsigned int *execnt);
+int _ex(char **argv, lenv_s **lenv, unsigned int *execnt);
+int _cd(char **argv, lenv_s **lenv, unsigned int *execnt);
+int _setenv(char **argv, lenv_s **lenv, unsigned int *execnt);
+int _unsetenv(char **argv, lenv_s **lenv, unsigned int *execnt);
+int _history(char **argv, lenv_s **lenv, unsigned int *execnt);
+int _help(char **argv, lenv_s **lenv, unsigned int *execnt);
+int _hlphelp(char **av, lenv_s **lenv, unsigned int *e);
+int _hlpcd(char **av, lenv_s **lenv, unsigned int *e);
+int _hlpexit(char **av, lenv_s **lenv, unsigned int *e);
+int _hlphistory(char **av, lenv_s **lenv, unsigned int *e);
+
+
+/* strings functions */
+
+int _strlen(char *s);
+char *_strdup(char *str);
 int _strcmp(char *s1, char *s2);
+int _strncmp(char *s1, char *s2, int n);
 
-char *_getenv(const char *name);
+/* enviroment funcs */
+size_t print_list(lenv_s **head);
+int delete_node(lenv_s **head, unsigned int index);
+char **menv(lenv_s **head);
+lenv_s *add_node(lenv_s **head, char *str);
+lenv_s *cenv(char **env);
+void free_list(lenv_s **head);
+char *_getenv(char *name, lenv_s **lenv);
 
-int _putchar(int c);
-int print(char *str);
+/* input file */
+int inputfile(int argc, char **argv, lenv_s **lenv, unsigned int *execnt);
 
-void free_memory_p(char *);
-void free_memory_pp(char **);
-int cmp(const char *s1, const char *s2);
+/* variables */
+char **check_variable(char **argv, lenv_s **lenv);
+
+
+/* Int funcs */
 int _atoi(char *s);
-int _isalpha(char c);
-
-char *_strdup(char *s);
-
-int exit_cmd(char **, int, char *);
-int env_cmd(char **, int, char *);
-builtin_t is_builtin(char *cmd);
-int (*check_builtins(char **))(char **, int, char *);
+int _isdigit(char *s);
 
 #endif
