@@ -1,4 +1,4 @@
-#include "hsh.h"
+#include "shell.h"
 
 /**
  * check_builtin - checks if the input is a built-in command
